@@ -25,7 +25,11 @@ mc::ServoMotor::ServoMotor() {
 };
 
 void mc::ServoMotor::setAngle(int angle) {
-  setData(SET_PWM_DUTY_CYCLE_SERVO, instance, map(angle,0,180,600000,1740000));
+  setData(SET_PWM_DUTY_CYCLE_SERVO, instance, map(angle,0,180,7,28));
+}
+
+void mc::ServoMotor::detach() {
+  setData(SET_PWM_DUTY_CYCLE_SERVO, instance, -1);
 }
 
 void mc::ServoMotor::setFrequency(int frequency) {
