@@ -1,6 +1,6 @@
 /*
-  DCMotor.cpp - Library for Arduino MKR Motor Shield
-  Copyright (c) 2018 Arduino AG.  All right reserved.
+  DCMotor.cpp - Library for Arduino Motor Shields
+  Copyright (c) 2018-2019 Arduino AG.  All right reserved.
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -43,11 +43,13 @@ DCMotor::DCMotor() {
   instance = next_instance;
   next_instance++;
   if (instance == 0) {
-    in1 = MOTOR_3_PIN_A; //2;
-    in2 = MOTOR_3_PIN_B; //3;
+    in1 = MOTOR_3_PIN_B; //3;
+    in2 = MOTOR_3_PIN_A; //2;
+    
   } else {
-    in1 = MOTOR_4_PIN_A; //5;
-    in2 = MOTOR_4_PIN_B; //4;
+    in1 = MOTOR_4_PIN_B; //4;
+    in2 = MOTOR_4_PIN_A; //5;
+    
   }
   pinMode(in1, OUTPUT);
   pinMode(in2, OUTPUT);

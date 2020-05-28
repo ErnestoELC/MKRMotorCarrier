@@ -65,30 +65,42 @@ bool PID::Compute()
       /*Compute all the working error variables*/
       Fix16 input = *myInput;
       Fix16 error = *mySetpoint - input;
-      Fix16 dInput = (input - lastInput);
-      outputSum+= (ki * error);
+      //Fix16 dInput = (input - lastInput);
+      Fix16 dError = (error - lastError);
+      iError += error; //add error to the integral term
+      
+      //outputSum+= (ki * error);
+      
+      
+      Fix16 Pout = kp * error;
+      Fix16 Iout = ki * iError;     
+      Fix16 Dout = kd * dError;
 
       /*Add Proportional on Measurement, if P_ON_M is specified*/
-      if(!pOnE) outputSum-= kp * dInput;
+      //if(!pOnE) outputSum-= kp * dInput;
 
-      if(outputSum > outMax) outputSum= outMax;
-      else if(outputSum < outMin) outputSum= outMin;
+      //if(outputSum > outMax) outputSum= outMax;
+      //else if(outputSum < outMin) outputSum= outMin;
 
-      /*Add Proportional on Error, if P_ON_E is specified*/
-	   Fix16 output;
-      if(pOnE) output = kp * error;
-      else output = Fix16(0.0);
+      Fix16 output;
+      /*Add Proportional on Error, if P_ON_E is specified*/	   
+      //if(pOnE) output = kp * error;
+      //if(pOnE) Pout = kp * error;
+      //else output = Fix16(0.0);
 
       /*Compute Rest of PID Output*/
-      output += outputSum - kd * dInput;
+      //output += outputSum - kd * dInput;
+
+      output = Pout + Iout + Dout;
 
 	    if(output > outMax) output = outMax;
       else if(output < outMin) output = outMin;
 	    *myOutput = output;
-
+      
       /*Remember some variables for next time*/
       lastInput = input;
       lastTime = now;
+      lastError = error;
 	    return true;
    }
    else return false;

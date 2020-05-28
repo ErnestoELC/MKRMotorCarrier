@@ -46,7 +46,7 @@ EncoderWrapper::EncoderWrapper(int pinA, int pinB, int index) {
   enc = new Encoder(pinA, pinB);
   obj[index] = this;
   if (index == 0) {
-    registerTimedEvent(populateRegisters_wrapper, this, 10);
+    registerTimedEvent(populateRegisters_wrapper, this, 10); //Should I modify this?
   }
 }
 

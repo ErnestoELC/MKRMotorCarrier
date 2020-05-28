@@ -1,6 +1,6 @@
 /*
-  Common.h - Library for Arduino MKR Motor Shield
-  Copyright (c) 2018 Arduino AG.  All right reserved.
+  Common.h - Library for Arduino Motor Shields
+  Copyright (c) 2018-2019 Arduino AG.  All right reserved.
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -13,6 +13,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+
 
 enum Commands {
   GET_VERSION = 0x01,
@@ -42,6 +44,7 @@ enum Commands {
   GET_INTERNAL_TEMP,
   CLEAR_IRQ,
   GET_FREE_RAM,
+  GET_PID_VAL
 };
 
 enum IRQCause {
@@ -57,14 +60,30 @@ enum IRQCause {
 #define MOTOR_4_PIN_A 4
 #define MOTOR_4_PIN_B 5
 
-#define IN1 A6
-#define IN2 A1
-#define IN3 A5
-#define IN4 A2
+
+#ifdef ARDUINO_SAMD_NANO_33_IOT
+  #define IN1 A7
+  #define IN2 A2
+  #define IN3 A6
+  #define IN4 A3
+#else
+  #define IN1 A6
+  #define IN2 A1
+  #define IN3 A5
+  #define IN4 A2
+#endif
+
+//#include "src/libfixmath/fix16.hpp"
+#include "src/FpF.hpp"
+#define Fix16 mn::MFixedPoint::FpF32<8> 
 
 namespace mc {
 int getData(Commands cmd, uint8_t target, uint8_t* buf);
 void setData(Commands cmd, uint8_t target, int data);
-void setDataPIDGains(Commands cmd, uint8_t target, int16_t P, int16_t I, int16_t D);
+//void setDataPIDGains(Commands cmd, uint8_t target, int16_t P, int16_t I, int16_t D);
+//void setDataPIDGains(Commands cmd, uint8_t target, float P, float I, float D);
+void setDataPIDGains(Commands cmd, uint8_t target, Fix16 P, Fix16 I, Fix16 D);
+int getDataPIDGains(Commands cmd, uint8_t target, uint8_t* buf, int dataSize);
 int getData(Commands cmd, uint8_t* buf);
+
 }

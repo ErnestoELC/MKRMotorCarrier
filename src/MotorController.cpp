@@ -1,6 +1,6 @@
 /*
-  MotorCOntroller.cpp - Library for Arduino MKR Motor Shield
-  Copyright (c) 2018 Arduino AG.  All right reserved.
+  MotorCOntroller.cpp - Library for Arduino Motor Shields
+  Copyright (c) 2018-2019 Arduino AG.  All right reserved.
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -17,6 +17,13 @@
 #include "MotorController.h"
 #include "Common.h"
 #include "Wire.h"
+
+#define PMIC_ADDRESS  0x6B
+#define PMIC_REG00    0x00
+#define PMIC_REG01    0x01
+#define PMIC_REG02    0x02
+#define PMIC_REG04    0x04
+#define PMIC_REG05    0x05
 
 String mc::MotorController::getFWVersion() {
   char ret[5];
@@ -42,6 +49,14 @@ float mc::MotorController::getTemperature() {
 
 int mc::MotorController::begin() {
   Wire.begin();
+
+  // PMIC initialization raw APIs: are sused to initialize the
+  // PMIC when used with nano 33 iot
+#ifdef ARDUINO_SAMD_NANO_33_IOT
+   Serial.println("Board: Nano 33 IoT");
+   enable_battery_charging();
+   Serial.println("Charging enabled....");
+#endif
   String version = getFWVersion();
   if (version.c_str()[0] == '0') {
     return 1;
@@ -60,3 +75,29 @@ int mc::MotorController::getFreeRam() {
   getData(GET_FREE_RAM, (uint8_t*)&ret);
   return ret;
 }
+
+void mc::MotorController::enable_battery_charging() {
+  Wire.beginTransmission(PMIC_ADDRESS);
+  Wire.write(PMIC_REG00);
+  Wire.write(0x06); // min sys voltage 3.88V + max input current 2.0 A
+  Wire.endTransmission();
+  Wire.beginTransmission(PMIC_ADDRESS);
+  Wire.write(PMIC_REG01);
+  Wire.write(0x1B); // Charge Battery + Minimum System Voltage 3.5V
+  Wire.endTransmission();
+  Wire.beginTransmission(PMIC_ADDRESS);
+  Wire.write(PMIC_REG02);
+  Wire.write(0x00); // Charge current  512 mA
+  Wire.endTransmission();
+  Wire.beginTransmission(PMIC_ADDRESS);
+  Wire.write(PMIC_REG04);
+  Wire.write(0x9E); // Charge Voltage Limit 4.128V
+  Wire.endTransmission();
+  Wire.beginTransmission(PMIC_ADDRESS);
+  Wire.write(PMIC_REG05);
+  Wire.write(0x8A); // Enable Battery Charge termination + disable watchdog
+  Wire.endTransmission();
+}
+
+
+

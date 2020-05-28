@@ -1,0 +1,46 @@
+In D11-Firware:
+
+    case GET_PID_VAL:
+      Fix16 gains*;
+      pid_control[target]->getGains(gains);
+      Wire.write((Fix16*)gains,3);
+      break;
+	  
+-------------------------
+In PID.h:
+
+    void getGains(Fix16* gains) {
+      if (this->mode == CL_VELOCITY) {
+        (*gains)[0] = pid_velo->GetKp();
+        (*gains)[1] = pid_velo->GetKi();
+        (*gains)[2] = pid_velo->GetKd();
+      }
+      if (this->mode == CL_POSITION) {
+        (*gains)[0] = pid_pos->GetKp();
+        (*gains)[1] = pid_pos->GetKi();
+        (*gains)[2] = pid_pos->GetKd();        
+      }
+    };
+
+-------------------------
+In common.h:
+	
+	enum commands:
+	.
+	.
+	GET_PID_VAL
+	
+----------------------------------------
+D11-Firmware
+
+    case GET_PID_VAL:
+      Fix16* gains;
+      pid_control[target]->getGains(gains);
+      int16_t P16t = ((int16_t)gains[0]) * short(1000);
+      int16_t I16t = ((int16_t)gains[1]) * short(1000);
+      int16_t D16t = ((int16_t)gains[2]) * short(1000);      
+      Wire.write((uint8_t*)&P16t,2);
+      Wire.write((uint8_t*)&I16t,2);
+      Wire.write((uint8_t*)&D16t,2);
+      break;
+  }

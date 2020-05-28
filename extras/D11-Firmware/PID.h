@@ -6,6 +6,7 @@
 #include "DCMotor.h"
 
 #define Fix16 mn::MFixedPoint::FpF32<8>
+//#define Fix16 mn::MFixedPoint::FpF32<16>
 
 typedef enum {
   CL_OPEN_LOOP = 0,
@@ -35,6 +36,20 @@ class PIDWrapper {
 
     void resetGains();
 
+
+    void getGains(Fix16* gains) {
+      if (this->mode == CL_VELOCITY) {
+        gains[0] = pid_velo->GetKp();
+        gains[1] = pid_velo->GetKi();
+        gains[2] = pid_velo->GetKd();
+      }
+      if (this->mode == CL_POSITION) {
+        gains[0] = pid_pos->GetKp();
+        gains[1] = pid_pos->GetKi();
+        gains[2] = pid_pos->GetKd();
+      }
+    };
+
     void setControlMode(cl_control mode) {
       this->mode = mode;
       run();
@@ -61,7 +76,7 @@ class PIDWrapper {
 
     void setLimits(int16_t minDuty, int16_t maxDuty) {
       if (mode == CL_POSITION) {
-        pid_pos->SetOutputLimits(Fix16(minDuty), Fix16(maxDuty));
+        pid_pos->SetOutputLimits(Fix16(minDuty), Fix16(maxDuty));        
       }
       if (mode == CL_VELOCITY) {
         pid_velo->SetOutputLimits(Fix16(minDuty), Fix16(maxDuty));

@@ -1,6 +1,6 @@
 /*
-  MKRMotorShield.cpp - Library for Arduino MKR Motor Shield
-  Copyright (c) 2018 Arduino AG.  All right reserved.
+  ArduinoMotorCarrier.cpp - Library for Arduino Motor Shields
+  Copyright (c) 2018-2019 Arduino AG.  All right reserved.
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -14,16 +14,27 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "MKRMotorShield.h"
+#include "ArduinoMotorCarrier.h"
 
 namespace mc {
-void setDataPIDGains(Commands cmd, uint8_t target, int16_t P, int16_t I, int16_t D) {
+// void setDataPIDGains(Commands cmd, uint8_t target, int16_t P, int16_t I, int16_t D) {
+//   Wire.beginTransmission(I2C_ADDRESS);
+//   Wire.write((uint8_t)cmd);
+//   Wire.write((uint8_t)target);
+//   Wire.write((uint8_t*)&P, 2);
+//   Wire.write((uint8_t*)&I, 2);
+//   Wire.write((uint8_t*)&D, 2); 
+//   Wire.endTransmission();
+// }
+
+//Set Data (gains) with Fix16 format
+void setDataPIDGains(Commands cmd, uint8_t target, Fix16 P, Fix16 I, Fix16 D) {
   Wire.beginTransmission(I2C_ADDRESS);
   Wire.write((uint8_t)cmd);
   Wire.write((uint8_t)target);
-  Wire.write((uint8_t*)&P, 2);
-  Wire.write((uint8_t*)&I, 2);
-  Wire.write((uint8_t*)&D, 2); 
+  Wire.write((uint8_t*)&P, 4);
+  Wire.write((uint8_t*)&I, 4);
+  Wire.write((uint8_t*)&D, 4); 
   Wire.endTransmission();
 }
 
@@ -34,6 +45,44 @@ void setData(Commands cmd, uint8_t target, int data) {
   Wire.write((uint8_t*)&data, 4);
   Wire.endTransmission();
 }
+
+int getDataPIDGains(Commands cmd, uint8_t target, uint8_t* buf, int dataSize) {
+  Wire.beginTransmission(I2C_ADDRESS);
+  Wire.write((uint8_t)cmd);
+  Wire.write((uint8_t)target);
+  Wire.endTransmission();
+
+  int i = 0;
+  Wire.requestFrom(I2C_ADDRESS, dataSize + 1);  //one extra for the irq_status
+  uint8_t status =  Wire.read();
+  if (status != 0) controller.irq_status = status;
+  
+    while (Wire.available()) {   
+      buf[i++] = (uint8_t)Wire.read();
+    }    
+  return i;
+}
+
+
+// int getDataPIDGains(Commands cmd, uint8_t target, uint8_t* buf, int dataSize) {
+//   Wire.beginTransmission(I2C_ADDRESS);
+//   Wire.write((uint8_t)cmd);
+//   Wire.write((uint8_t)target);
+//   Wire.endTransmission();
+
+//   Wire.requestFrom(I2C_ADDRESS, dataSize);
+//   uint8_t status =  Wire.read();
+//   if (status != 0) {
+//     controller.irq_status = status;
+//   }
+
+//   int i = 0;
+//   while (Wire.available()) {
+//     buf[i++] = (uint8_t)Wire.read();
+//   }
+//   return i;
+// }
+
 
 int getData(Commands cmd, uint8_t target, uint8_t* buf) {
   Wire.beginTransmission(I2C_ADDRESS);

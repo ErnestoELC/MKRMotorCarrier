@@ -69,7 +69,7 @@ typedef struct {
 class Encoder
 {
 public:
-	Encoder(uint8_t pin1, uint8_t pin2) {
+	Encoder(uint8_t pin2, uint8_t pin1) {//NanoMotorCarrier Pin exchange
 		#ifdef INPUT_PULLUP
 		pinMode(pin1, INPUT_PULLUP);
 		pinMode(pin2, INPUT_PULLUP);

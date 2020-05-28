@@ -5,6 +5,7 @@
 #include "../FpF.hpp"
 
 #define Fix16 	mn::MFixedPoint::FpF32<8>
+//#define Fix16 	mn::MFixedPoint::FpF32<16>
 
 class PID
 {
@@ -85,6 +86,8 @@ class PID
 			  
 	unsigned long lastTime;
 	Fix16 outputSum, lastInput;
+  Fix16 lastError;
+  Fix16 iError; //integral error
 
 	unsigned long SampleTime;
 	Fix16 outMin, outMax;

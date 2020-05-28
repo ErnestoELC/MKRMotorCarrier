@@ -2,7 +2,7 @@
 #include "Events.h"
 #include "Wire.h"
 
-#define SCALE_FACTOR  (77)
+#define SCALE_FACTOR  (236)//(77)
 
 void Battery::readBattery() {
   index++;
@@ -18,7 +18,7 @@ void readBattery_wrapper(void* arg)
 
 Battery::Battery(int pinA) {
   pin = pinA;
-  registerTimedEvent(readBattery_wrapper, this, 1000);
+  registerTimedEvent(readBattery_wrapper, this, 1000); //Maybe update this.
   readBuf[0] = (int)analogRead(pin);
 }
 

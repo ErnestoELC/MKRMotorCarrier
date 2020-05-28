@@ -2,6 +2,7 @@
 #include "src/FpF.hpp"
 
 #define Fix16 mn::MFixedPoint::FpF32<8>
+//#define Fix16 mn::MFixedPoint::FpF32<16>
 
 class EncoderWrapper {
   public:
